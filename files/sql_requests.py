@@ -6,7 +6,7 @@ class DataBase:
     __instance = None
     HOST = "127.0.0.1"
     USER = "root"
-    PASSWORD = "NekitVip123_ZXCPUDGE228"
+    PASSWORD = ""
     DB_NAME = "users"
     
     
