@@ -1,6 +1,7 @@
 from random import randint
 import json
 import requests
+from bs4 import BeautifulSoup
 
 
 headers = {
@@ -25,15 +26,19 @@ cookies = {
 
 
 def main():
-    with open('Agents\\solo.txt', encoding='utf-8') as f:
-        alls = f.readlines()
-    
-    user_agent = alls[randint(0, 1107)]
-    headers['User-Agent'] = user_agent.strip()
-    
-    request = requests.get('https://www.gismeteo.ru/catalog/russia/', headers=headers, cookies=cookies)
-    
-    print(request.text)
+
+    for i in range(1):
+        
+        with open('Agents\\solo.txt', encoding='utf-8') as f:
+            alls = f.readlines()
+        
+        user_agent = alls[randint(0, 1107)]
+        headers['User-Agent'] = user_agent.strip()
+
+        request = requests.get('https://www.gismeteo.ru/catalog/russia/', headers=headers, cookies=cookies)
+        
+        bs = BeautifulSoup(request.text, 'lxml')
+        print(bs.find('section', class_='catalog-body').find(class_='catalog-subtitle'))
 
 
 main()
