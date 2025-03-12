@@ -1,19 +1,19 @@
+import sys
 from time import sleep
 from constants import headers, cookies
 from funcs.randomag import randomUserAgent
-import requests
 from bs4 import BeautifulSoup
 from funcs.punctswk import punctsPars
 from funcs.regions import regionPars
 
 
-def countrr(name, url):
+def countrr(name, url, session):
     print(f'Начата работа над страной: "{name}"')
     
     agent = randomUserAgent()
     headers['User-Agent'] = agent
-    sleep(0.5)
-    request = requests.get(f'https://www.gismeteo.ru{url}', headers=headers, cookies=cookies)
+
+    request = session.get(f'https://www.gismeteo.ru{url}', headers=headers, cookies=cookies, impersonate="chrome110")
     txt_req = request.text
     
     bs = BeautifulSoup(txt_req, 'lxml')
@@ -25,7 +25,7 @@ def countrr(name, url):
         punctsPars(txt_req, name)
     elif result == 'Регионы':
         bs = BeautifulSoup(txt_req, 'lxml')
-    
+        
         region_groups = bs.find_all(class_='catalog-group-with-letter')
 
         for group in region_groups:
@@ -34,5 +34,6 @@ def countrr(name, url):
             for punct in region_links:
                 region_name = punct.find(class_='catalog-group-item-name').text.strip()
                 region_href = punct['href']
-                
-                regionPars(name, region_name, region_href)
+
+                regionPars(name, region_name, region_href, session)
+                sleep(3)

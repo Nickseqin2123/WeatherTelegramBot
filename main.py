@@ -1,4 +1,6 @@
-import requests
+from time import sleep
+
+from curl_cffi.requests.session import Session
 from bs4 import BeautifulSoup
 from constants import headers, cookies
 from funcs.randomag import randomUserAgent
@@ -10,7 +12,8 @@ def main():
     agent = randomUserAgent()
     headers['User-Agent'] = agent
 
-    request = requests.get('https://www.gismeteo.ru/catalog/', headers=headers, cookies=cookies)
+    session = Session()
+    request = session.get('https://www.gismeteo.ru/catalog/', headers=headers, cookies=cookies, impersonate="chrome110")
         
     bs = BeautifulSoup(request.text, 'lxml')
     countries_groups = bs.find_all(class_='catalog-group-with-letter')
@@ -23,7 +26,7 @@ def main():
             country_url = country['href']
             # counrtyAdd(name)
             
-            countrr(country_name, country_url)
-
+            countrr(country_name, country_url, session)
+            sleep(5)
 
 main()

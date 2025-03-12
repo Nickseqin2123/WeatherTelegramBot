@@ -2,25 +2,24 @@ from time import sleep
 from bs4 import BeautifulSoup
 from constants import headers, cookies
 from funcs.randomag import randomUserAgent
-import requests
 from bs4 import BeautifulSoup
 from funcs.punctswk import punctsPars
 from funcs.rayons import rayonPars
 
 
-def regionPars(country_name, name, region_href):
+def regionPars(country_name, name, region_href, session):
     print(f'Начата работа над регионом: "{name}" Страна: {country_name}')
     
     agent = randomUserAgent()
     headers['User-Agent'] = agent
-    sleep(1)
-    request = requests.get(f'https://www.gismeteo.ru{region_href}', headers=headers, cookies=cookies)
+    sleep(3)
+    request = session.get(f'https://www.gismeteo.ru{region_href}', headers=headers, cookies=cookies, impersonate="chrome110")
     txt_req = request.text
     
     bs = BeautifulSoup(txt_req, 'lxml')
     section_content = bs.find_all('section', class_='catalog-body') 
     result = section_content[-1].find(class_='catalog-subtitle').text
-    sleep(0.2)
+
     if result == 'Пункты':
         punctsPars(txt_req, country_name, region=name)
     elif result == 'Районы':
@@ -35,4 +34,4 @@ def regionPars(country_name, name, region_href):
                 rayon_name = rayon.find(class_='catalog-group-item-name').text.strip()
                 rayon_href = rayon['href']
                 
-                rayonPars(country_name, name, rayon_name, rayon_href)
+                rayonPars(country_name, name, rayon_name, rayon_href, session)

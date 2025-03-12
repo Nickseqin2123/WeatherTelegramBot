@@ -1,10 +1,12 @@
 from bs4 import BeautifulSoup
+from time import sleep
 
 
 def punctsPars(html, country, region=None, rayon=None):
     print(f"Парсим пункты: '{country}' регион: {region} район: {rayon}")
-    bs = BeautifulSoup(html, 'lxml')
     
+    bs = BeautifulSoup(html, 'lxml')
+    sleep(1)
     puncts_groups = bs.find_all(class_='catalog-group-with-letter')
 
     for group in puncts_groups:
