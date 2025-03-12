@@ -3,7 +3,6 @@ from pprint import pprint
 import requests
 
 
-API = '1xz87sfCI5go5njQ5jHumYmK6OcCLn1u'
 
 
 req = requests.get(f'http://geohelper.info/api/v1/countries?locale[lang]=ru&apiKey={API}')
