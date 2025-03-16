@@ -4,14 +4,15 @@ from sqlalchemy import String, ForeignKey
 
 class Model(DeclarativeBase):
     ...
-    
+
 
 class Countries(Model):
     __tablename__ = 'countries'
     
-    iso: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True)
+    iso: Mapped[str] = mapped_column(String(10), unique=True)
     name: Mapped[str] = mapped_column(String(100))
-    
+
     regions = relationship('Regions', back_populates='countries', lazy='selectin')
     districts = relationship('Districts', back_populates='countries', lazy='selectin')
     cities = relationship('Districts', back_populates='countries', lazy='selectin')
@@ -22,7 +23,7 @@ class Regions(Model):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     
-    country_id: Mapped[int] = mapped_column(ForeignKey('countries.iso', ondelete='CASCADE'))
+    country_id: Mapped[int] = mapped_column(ForeignKey('countries.id', ondelete='CASCADE'))
     
     name: Mapped[str] = mapped_column(String(100))
     
@@ -35,7 +36,7 @@ class Districts(Model):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     
-    country_id: Mapped[int] = mapped_column(ForeignKey('countries.iso', ondelete='CASCADE'))
+    country_id: Mapped[int] = mapped_column(ForeignKey('countries.id', ondelete='CASCADE'))
     region_id: Mapped[int] = mapped_column(ForeignKey('regions.id', ondelete='CASCADE'))
     
     name: Mapped[str] = mapped_column(String(100))
@@ -48,7 +49,7 @@ class Сities(Model):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     
-    country_id: Mapped[int] = mapped_column(ForeignKey('countries.iso', ondelete='CASCADE'))
+    country_id: Mapped[int] = mapped_column(ForeignKey('countries.id', ondelete='CASCADE'))
     region_id: Mapped[int] = mapped_column(ForeignKey('regions.id', ondelete='CASCADE'))
     district_id: Mapped[int] = mapped_column(ForeignKey('districts.id', ondelete='CASCADE'), nullable=True)
     
