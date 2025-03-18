@@ -1,43 +1,33 @@
-import json
+import asyncio
 from pprint import pprint
 from configparser import ConfigParser
 import requests
+from requestss.ssp import add_region, get_country
 
 
-def districts(region_id, API):
-    req = requests.get(f'http://geohelper.info/api/v1/districts?pagination[limit]=100&regionId={region_id}&locale[lang]=ru&apiKey={API}')
-    rayons = req.json()
-    print(rayons)
-
-
-def region(iso, API):
-    req = requests.get(f'http://geohelper.info/api/v1/regions?pagination[limit]=100&filter[countryIso]={iso}&locale[lang]=ru&apiKey={API}')
-    regions = req.json()
-    pagination = regions['pagination']
-
-    for page in range(pagination['totalPageCount']):
-        req = requests.get(f'http://geohelper.info/api/v1/regions?pagination[page]={page}&pagination[limit]=100&filter[countryIso]={iso}&locale[lang]=ru&apiKey={API}')
-        regions = req.json()
-        
-        for i in regions['result']:
-            print(f'    ---> ID: {i['id']} Имя региона: {i['name']}')
-            # districts(i['id'], API)
-            break
-
-
-def main():
+async def main():
     cfg = ConfigParser()
     cfg.read('data.ini')
 
     API = cfg['TOKEN']['API']
 
-    req = requests.get(f'http://geohelper.info/api/v1/countries?locale[lang]=ru&apiKey={API}')  
-    countries = req.json()
+    req = requests.get(f'http://geohelper.info/api/v1/cities?filter[countryIso]=RU&pagination[limit]=10&locale[lang]=ru&apiKey={API}')  
+    pars = req.json()
+    pagi = pars['pagination']
     
-    for i in countries['result']:
-        # print(f'ISO: {i['iso']} Имя страны: {i['name']}')
-        region(i['iso'], API)
+    for i in range(1, pagi['totalPageCount'] + 1):
+        req = requests.get(f'http://geohelper.info/api/v1/cities?pagination[page]={i}&filter[countryIso]=RU&pagination[limit]=100&locale[lang]=ru&apiKey={API}')
+        pars = req.json()
+        
+        for obj in pars['result']:
+            print(obj)
+            break
         break
 
+        
+    
+    # req = requests.get(f'http://geohelper.info/api/v1/districts?filter[cityId]={cities['id']}&pagination[limit]=10&locale[lang]=ru&apiKey={API}')
+    # pprint(req.json())
+    
 
-main()
+asyncio.run(main())

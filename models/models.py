@@ -15,7 +15,7 @@ class Countries(Model):
 
     regions = relationship('Regions', back_populates='countries', lazy='selectin')
     districts = relationship('Districts', back_populates='countries', lazy='selectin')
-    cities = relationship('Districts', back_populates='countries', lazy='selectin')
+    cities = relationship('Сities', back_populates='countries', lazy='selectin')
 
 
 class Regions(Model):
@@ -29,6 +29,7 @@ class Regions(Model):
     
     countries = relationship('Countries', back_populates='regions', lazy='selectin')
     districts = relationship('Districts', back_populates='regions', lazy='selectin')
+    cities = relationship('Сities', back_populates='regions', lazy='selectin')
     
 
 class Districts(Model):
@@ -42,6 +43,7 @@ class Districts(Model):
     name: Mapped[str] = mapped_column(String(100))
     countries = relationship('Countries', back_populates='districts', lazy='selectin')
     regions = relationship('Regions', back_populates='districts', lazy='selectin')
+    cities = relationship('Сities', back_populates='districts', lazy='selectin')
     
 
 class Сities(Model):
@@ -56,5 +58,5 @@ class Сities(Model):
     name: Mapped[str] = mapped_column(String(100))
     
     countries = relationship('Countries', back_populates='cities', lazy='selectin')
-    districts = relationship('Regions', back_populates='cities', lazy='selectin')
-    regions = relationship('Districts', back_populates='cities', lazy='selectin')
+    districts = relationship('Districts', back_populates='cities', lazy='selectin')
+    regions = relationship('Regions', back_populates='cities', lazy='selectin')

@@ -1,6 +1,6 @@
 import configparser
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncEngine
 
 
 class Configurator:
@@ -34,7 +34,7 @@ class Configurator:
                                   max_overflow=10)
         }
 
-        self.engine = connectors[type_connect]
+        self.engine: AsyncEngine = connectors[type_connect]
         
     @property
     def async_connect_url(self):
