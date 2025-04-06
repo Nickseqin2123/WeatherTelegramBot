@@ -1,23 +1,8 @@
 import asyncio
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio.session import async_sessionmaker
-from models.models import Countries, Regions
+from models.models import Countries, Regions, Districts
 from .man import cfg
-
-
-async def add_country(iso, name):
-    session = async_sessionmaker(cfg.engine)
-    
-    try:
-        async with session() as session:
-            query = insert(Countries).values(iso=iso, name=name)
-                
-            await session.execute(query)
-            await session.commit()
-    finally:
-        await cfg.engine.dispose()
-    
-    return 'ok'
 
 
 async def get_country(iso):
@@ -33,19 +18,31 @@ async def get_country(iso):
             return parsed
     finally:
         await cfg.engine.dispose()
+    
 
-
-async def add_region(idd, country_id, name):
+async def get_counties():
     session = async_sessionmaker(cfg.engine)
     
     try:
         async with session() as session:
-            query = insert(Regions).values(id=idd, country_id=country_id, name=name)
+            query = select(Countries)
                 
-            await session.execute(query)
-            await session.commit()
+            data = await session.execute(query)
+            parsed = data.all()
+            
+            return parsed
     finally:
         await cfg.engine.dispose()
 
 
-asyncio.run(get_country('RU'))
+async def add_rayon(country_id, region_id, name):
+    session = async_sessionmaker(cfg.engine)
+    
+    try:
+        async with session() as session:
+            query = insert(Districts).values(country_id=country_id, region_id=region_id, name=name)
+            await session.execute(query)
+            await session.commit()
+            
+    finally:
+        await cfg.engine.dispose()

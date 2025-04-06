@@ -1,8 +1,9 @@
 import asyncio
+import time
 from pprint import pprint
 from configparser import ConfigParser
 import requests
-from requestss.ssp import add_region, get_country
+from requestss.ssp import get_counties, add_rayon
 
 
 async def main():
@@ -10,24 +11,30 @@ async def main():
     cfg.read('data.ini')
 
     API = cfg['TOKEN']['API']
-
-    req = requests.get(f'http://geohelper.info/api/v1/cities?filter[countryIso]=RU&pagination[limit]=10&locale[lang]=ru&apiKey={API}')  
-    pars = req.json()
-    pagi = pars['pagination']
+    countries = await get_counties()
     
-    for i in range(1, pagi['totalPageCount'] + 1):
-        req = requests.get(f'http://geohelper.info/api/v1/cities?pagination[page]={i}&filter[countryIso]=RU&pagination[limit]=100&locale[lang]=ru&apiKey={API}')
+    for country in countries:
+        country = country[0]
+        iso = country.iso
+        cou_id = country.id
+        
+        req = requests.get(f'http://geohelper.info/api/v1/cities?filter[countryIso]={iso}&pagination[limit]=100&locale[lang]=ru&apiKey={API}')  
+        time.sleep(1)
         pars = req.json()
+        pagi = pars['pagination']
         
-        for obj in pars['result']:
-            print(obj)
-            break
-        break
-
-        
-    
-    # req = requests.get(f'http://geohelper.info/api/v1/districts?filter[cityId]={cities['id']}&pagination[limit]=10&locale[lang]=ru&apiKey={API}')
-    # pprint(req.json())
+        for i in range(1, pagi['totalPageCount'] + 1):
+            req = requests.get(f'http://geohelper.info/api/v1/cities?pagination[page]={i}&filter[countryIso]={iso}&pagination[limit]=100&locale[lang]=ru&apiKey={API}')
+            time.sleep(1)
+            pars = req.json()
+            
+            for obj in pars['result']:
+                rayon = obj.get('area')
+                
+                if rayon:
+                    region_id = obj['regionId']
+                    await add_rayon(cou_id, region_id, rayon)
+    print('ВСЁ!')
     
 
 asyncio.run(main())
