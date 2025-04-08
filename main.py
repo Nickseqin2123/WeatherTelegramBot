@@ -5,15 +5,21 @@ import configparser
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters.command import CommandStart
+from keyboards.comms import start_keyb
+from main_router import router as main_router
 
 
 dp = Dispatcher()
+dp.include_router(
+    main_router
+)
 
 
 @dp.message(CommandStart())
 async def echo(message: Message):
     await message.answer(
         text=f'Приветствую тебя в боте в котором ты сможешь узнать погоду из любой точки мира. Нажми кнопку "Узнать погоду", чтобы продолжить.',
+        reply_markup=await start_keyb()
     )
 
 
