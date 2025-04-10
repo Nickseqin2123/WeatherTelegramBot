@@ -8,6 +8,7 @@ from aiogram.filters.command import CommandStart
 from keyboards.comms import start_keyb
 from main_router import router as main_router
 
+from requests_srv.content import Content
 
 dp = Dispatcher()
 dp.include_router(
@@ -27,6 +28,7 @@ async def main():
     logging.basicConfig(level=logging.INFO)
     cnf = configparser.ConfigParser()
     cnf.read('data.ini')
+    Content()
     
     bot = Bot(token=cnf['TOKEN']['token'])
     
