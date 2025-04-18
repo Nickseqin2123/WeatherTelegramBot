@@ -2,7 +2,7 @@ from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 async def start_keyb():
-    DATA = ('Узнать погоду', 'Тех.поддержка')
+    DATA = ('Узнать погоду', 'Регистрация пункта', 'Тех.поддержка')
     builder = ReplyKeyboardBuilder()
     
     for name in DATA:

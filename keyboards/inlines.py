@@ -2,12 +2,12 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from aiogram.types import InlineKeyboardButton
 
 
-async def bui():
+async def bui(now):
     bilder = InlineKeyboardBuilder()
     
     data = [
         {'name': '<<<', 'id': 'left'},
-        {'name': 'num', 'id': 'num'},
+        {'name': str(now), 'id': 'num'},
         {'name': '>>>', 'id': 'right'},
         
     ]

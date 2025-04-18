@@ -1,4 +1,3 @@
-import asyncio
 from configparser import ConfigParser
 from aiohttp import ClientSession
 

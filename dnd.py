@@ -18,9 +18,15 @@ req_cou = requests.get(url='https://data-api.oxilor.com/rest/countries', headers
 
 countries = req_cou.json()
 
-req_reg = requests.get(url=f'https://data-api.oxilor.com/rest/regions?countryCode={ct_cde}&first=100', headers=headers)
+par = []
 
-regions = req_reg.json()
+for i in countries:
+    par.append({'id': i['id'], 'name': i['name'], 'type': i['type']})
 
-for i in regions['edges']:
-    print(i)
+print(par)
+# req_reg = requests.get(url=f'https://data-api.oxilor.com/rest/regions?countryCode={ct_cde}&first=100', headers=headers)
+
+# regions = req_reg.json()
+
+# for i in regions['edges']:
+#     print(i)
