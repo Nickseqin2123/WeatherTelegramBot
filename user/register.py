@@ -2,46 +2,65 @@ from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.types import ReplyKeyboardRemove
 
-from requests_srv.content import Content
-from uti.colectiona import colect
-from uti.paginator import paginate
-from uti.maketxt import txt_get
-from keyboards.inlines import bui
+from keyboards.comms import location, start_keyb
 
 
 router = Router(name=__name__)
 
 
 class Form(StatesGroup):
-    country = State()
-    region = State()
-    rayon = State()
-    punct = State()
+    cordinates = State()
 
 
 @router.message(F.text == 'Регистрация пункта')
 async def rtgister(message: Message, state: FSMContext):
-    await state.set_state(Form.country)
+    await state.set_state(Form.cordinates)
     
     await message.answer(
         text='''
 Давайте проведём быструю регистрацию вашего местоположения.
-Введите название вашей страны.
-Вы можете нажать на любую страну для копирования или же просто написать ее самому.
-        '''
+
+Отправьте геолокацию по кнопке или через нажатие на Скрепку -> Геопозиция.
+
+Предватительно отключите VPN. Это нужно для более лучшего резултата.
+        ''',
+        reply_markup=await location()
     )
-    content: Content = Content()
-    contr = await content.countries()
+
+
+@router.message(F.location)
+async def get_loc(message: Message, state: FSMContext):
+    await state.update_data(location=message.location)
+    data = await state.get_data()
+    await state.clear()
     
-    colection = await colect(contr)
-    to_pages = await paginate(colection, 13)
-    await state.update_data(pages=to_pages, now=1)
+    await message.answer(text='Спасибо! Геолокация получена.', reply_markup=ReplyKeyboardRemove())
     
-    to_txt = await txt_get(to_pages[1])
+    await summary(message, state, data)
+
+
+@router.message(F.text == 'Главное меню')
+async def main_menu(message: Message, state: FSMContext):
+    stat = await state.get_state()
+    
+    if stat is None:
+        return
+
+    await state.clear()
+    await message.answer(
+        text='Мы в главном меню',
+        reply_markup=await start_keyb()
+    )
+
+
+async def summary(message: Message, state: FSMContext, data: dict):
+    location = data['location']
     
     await message.answer(
-        text=to_txt,
-        parse_mode='MARKDOWN',
-        reply_markup=await bui(now=1)
+        text=f'''
+Широта: {location.latitude}
+Долгота: {location.longitude}''',
+reply_markup=await start_keyb()
     )

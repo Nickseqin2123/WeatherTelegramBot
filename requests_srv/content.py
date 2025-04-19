@@ -1,5 +1,8 @@
+import asyncio
+
 from configparser import ConfigParser
-from aiohttp import ClientSession
+from curl_cffi.requests import AsyncSession
+from fake_headers import Headers
 
 
 class Content:
@@ -15,21 +18,32 @@ class Content:
         cfg = ConfigParser()
         cfg.read('data.ini')
         
-        self.url = 'https://data-api.oxilor.com/rest/'
-        self.__token = cfg['TOKEN']['api']
-        self.__headers = {
-            'Authorization': f'Bearer {self.__token}',
-            'Accept-Language': 'ru'
-        }
+        self.url = 'https://yandex.ru/pogoda/cheboksary?'
+        self.init_dynamic_headers()
     
-    async def countries(self, **params):
-        ready_params = await self.make_params_query(**params)
-        full_url = f'{self.url}/countries{ready_params}'
+    def init_dynamic_headers(self):
+        headers = Headers(browser="chrome", os="win", headers=True).generate()
+        headers.update({
+            "authority": "yandex.ru",
+            "referer": "",
+            "accept-encoding": "gzip, deflate, br, zstd",
+            "sec-fetch-site": "none",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
+            "cache-control": "max-age=0",
+            })
         
-        async with ClientSession() as session:
-            async with session.get(full_url, headers=self.__headers) as response:
-                return await response.json()
-    
-    async def make_params_query(self, **params):
-        txt = [f'{key}={value}' for key, value in params.items()]
-        return '?' + '&'.join(txt)
+        self.headers = headers
+        
+    async def weather(self, lat, lon):
+        quer_url = f'{self.url}lat={lat}&lon={lon}'
+        self.headers.update({
+            'referer': quer_url
+        })
+        
+        session = AsyncSession(impersonate='chrome120')
+        
+        response = await session.get(url=quer_url, headers=self.headers)
+
+        return response.text
