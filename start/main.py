@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import configparser
 
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
@@ -8,7 +7,8 @@ from aiogram.filters.command import CommandStart
 from keyboards.comms import start_keyb
 from main_router import router as main_router
 
-from requests_srv.content import Content
+from requestss.content import Content
+from models.config import cfg
 
 
 dp = Dispatcher()
@@ -27,11 +27,9 @@ async def echo(message: Message):
 
 async def main():
     logging.basicConfig(level=logging.INFO)
-    cnf = configparser.ConfigParser()
-    cnf.read('data.ini')
     Content()
     
-    bot = Bot(token=cnf['TOKEN']['token'])
+    bot = Bot(token=cfg.token)
     
     await dp.start_polling(bot)
 

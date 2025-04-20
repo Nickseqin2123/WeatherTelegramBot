@@ -46,4 +46,5 @@ class Content:
         
         response = await session.get(url=quer_url, headers=self.headers)
 
-        return response.text
+        with open('base.html', 'w', encoding='utf-8') as f:
+            f.write(response.text)
