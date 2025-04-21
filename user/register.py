@@ -5,6 +5,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardRemove
 
 from keyboards.comms import location, start_keyb
+from requestss.dbreq import add_user
+from requestss.other import get_locality_name
 
 
 router = Router(name=__name__)
@@ -57,10 +59,20 @@ async def main_menu(message: Message, state: FSMContext):
 
 async def summary(message: Message, state: FSMContext, data: dict):
     location = data['location']
+    lati = location.latitude
+    long = location.longitude
+    
+    name: dict = await get_locality_name(lat=lati, lon=long)
+    
+    if name['type']:
+        txt = await add_user(user_id=message.from_user.id, name=name['data'], lat=location.latitude, lon=location.longitude)
+        await message.answer(
+            text=txt, 
+            reply_markup=await start_keyb()
+        )
+        return
     
     await message.answer(
-        text=f'''
-Широта: {location.latitude}
-Долгота: {location.longitude}''',
-reply_markup=await start_keyb()
+        text=name['data'],
+        reply_markup=await start_keyb()
     )
