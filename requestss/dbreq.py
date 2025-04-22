@@ -32,7 +32,7 @@ async def get_puncts(user_id: int):
             query = select(Puncts).filter(Puncts.user_id == user_id)
             resp = await session.execute(query)
             
-            return resp.all()
+            return resp.scalars().all()
     except Exception as er:
         return 'У вас не добавлены пункты. Добавьте их в меню регистрации'
     

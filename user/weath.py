@@ -1,32 +1,42 @@
 from aiogram import Router, F
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 
 
 from requestss.dbreq import get_puncts
-from requestss.content import Content
-from keyboards.comms import start_keyb
-from keyboards.inlines import puncts_butt
+from keyboards.comms import start_keyb, main_menukeyb
+from uti.paginator import paginator
+from keyboards.inlines import build_paginated_keyboard
 
 
 router = Router(name=__name__)
 
 
-class Menu(StatesGroup):
+class Actions(StatesGroup):
     menu = State()
     
 
 @router.message(F.text == 'Узнать погоду')
 async def weath_find(message: Message, state: FSMContext):
     response: list | str = await get_puncts(user_id=message.from_user.id)
-    
+
     if isinstance(response, list):
+        await message.answer(
+            text='Чуть-чуть подождите. Идет обработка данных...',
+            reply_markup=await main_menukeyb()
+        )
+        
+        await state.set_state(Actions.menu)
+        pages = await paginator(response, 3)
+        
+        await state.update_data(pages=pages)
         
         await message.answer(
-            text='Вот ваши зарегестрированные пункты.',
-            reply_markup=await puncts_butt()
+            text='Вот ваши пункты:',
+            reply_markup=await build_paginated_keyboard(pages=pages, current_page=1)
         )
+        
         return
     
     await message.answer(

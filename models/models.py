@@ -18,3 +18,6 @@ class Puncts(Model):
     __table_args__ = (
         UniqueConstraint('user_id', 'latitude', 'longitude', name='punct_combination'), # Комбинация user_id punct_name, будет уникальной
     )
+    
+    def __str__(self):
+        return f'<Puncts:{self.id}>'

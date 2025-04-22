@@ -25,3 +25,14 @@ async def location():
         one_time_keyboard=True)
 
     return location_keyboard
+
+
+async def main_menukeyb():
+    keyboard = ReplyKeyboardMarkup(keyboard=[
+            [
+             KeyboardButton(text="Главное меню")
+            ]
+        ],
+        resize_keyboard=True)
+
+    return keyboard
