@@ -3,9 +3,12 @@ from bs4 import BeautifulSoup
 
 async def parser(html: str):
     bs = BeautifulSoup(html, 'lxml')
-    
+
     main_content = bs.find(class_='content__top')
 
+    if main_content is None:
+        return 'Не удалось получить ответ от сервера. Попробуйте позже или напишите в тех.поддержку.'
+    
     on_title = main_content.find(class_='fact__title')
     punct_name = on_title.find(class_='title title_level_1 header-title__title').text
 
