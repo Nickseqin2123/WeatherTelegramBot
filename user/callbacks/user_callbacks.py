@@ -21,6 +21,7 @@ async def punct_gt(callback: CallbackQuery):
     user_id = callback.from_user.id
     lati = from_pars['lat']
     long = from_pars['lon']
+    print(lati, long)
     
     if users_last_clik.get(user_id):
         await callback.message.answer(

@@ -1,5 +1,5 @@
-import asyncio
-
+import json
+import os
 from configparser import ConfigParser
 from curl_cffi.requests import AsyncSession
 from fake_headers import Headers
@@ -15,12 +15,17 @@ class Content:
         return cls.__instance
     
     def __init__(self):
+        if hasattr(self, "initialized") and self.initialized:
+            return
+        
         cfg = ConfigParser()
         cfg.read('data.ini')
-        
+
         self.url = 'https://yandex.ru/pogoda/cheboksary?'
-        self.init_dynamic_headers()
-    
+        self.session = AsyncSession(impersonate='chrome120')
+
+        self.initialized = True
+        
     def init_dynamic_headers(self):
         headers = Headers(browser="chrome", os="win", headers=True).generate()
         headers.update({
@@ -38,12 +43,25 @@ class Content:
         
     async def weather(self, lat, lon):
         quer_url = f'{self.url}lat={lat}&lon={lon}'
+        
+        self.init_dynamic_headers()
         self.headers.update({
             'referer': quer_url
         })
+                
+        if os.path.exists('cookies.json'):
+            await self.load_cookies()
+    
+        response = await self.session.get(url=quer_url, headers=self.headers)
+        await self.save_cookies()
         
-        session = AsyncSession(impersonate='chrome120')
-        
-        response = await session.get(url=quer_url, headers=self.headers)
-
         return response.text
+    
+    async def save_cookies(self, filename='cookies.json'):          
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(self.session.cookies.get_dict(), f, ensure_ascii=False)
+
+    async def load_cookies(self, filename='cookies.json'):
+        with open(filename, encoding='utf-8') as f:
+            cookies = json.load(f)
+            self.session.cookies.update(cookies)
