@@ -34,7 +34,6 @@ async def get_puncts(user_id: int):
             
             return resp.scalars().all()
     except Exception as er:
-        return 'У вас не добавлены пункты. Добавьте их в меню регистрации'
-    
+        return    
     finally:
         await cfg.engine.dispose()

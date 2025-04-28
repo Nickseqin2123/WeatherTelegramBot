@@ -19,9 +19,9 @@ class Actions(StatesGroup):
 
 @router.message(F.text == 'Узнать погоду')
 async def weath_find(message: Message, state: FSMContext):
-    response: list | str = await get_puncts(user_id=message.from_user.id)
+    response: list = await get_puncts(user_id=message.from_user.id)
 
-    if isinstance(response, list):
+    if isinstance(response, list) and len(response):
         await message.answer(
             text='Чуть-чуть подождите. Идет обработка данных...',
             reply_markup=await main_menukeyb()
@@ -40,7 +40,7 @@ async def weath_find(message: Message, state: FSMContext):
         return
     
     await message.answer(
-        text=response
+        text='У вас не добавлены пункты. Добавьте их в меню регистрации'
     )
 
 

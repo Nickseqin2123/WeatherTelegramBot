@@ -21,7 +21,7 @@ class Content:
         cfg = ConfigParser()
         cfg.read('data.ini')
 
-        self.url = 'https://yandex.ru/pogoda/cheboksary?'
+        self.url = 'https://yandex.ru/pogoda?'
         self.session = AsyncSession(impersonate='chrome120')
 
         self.initialized = True
