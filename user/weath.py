@@ -20,7 +20,7 @@ class Actions(StatesGroup):
 @router.message(F.text == 'Узнать погоду')
 async def weath_find(message: Message, state: FSMContext):
     response: list | str = await get_puncts(user_id=message.from_user.id)
-
+    
     if isinstance(response, list):
         await message.answer(
             text='Чуть-чуть подождите. Идет обработка данных...',

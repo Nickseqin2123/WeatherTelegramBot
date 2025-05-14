@@ -31,10 +31,13 @@ async def get_puncts(user_id: int):
         async with session() as session:
             query = select(Puncts).filter(Puncts.user_id == user_id)
             resp = await session.execute(query)
+            scls = resp.scalars().all()
             
-            return resp.scalars().all()
+            if scls == []:
+                return 'У вас не добавлены пункты. Добавьте их в меню регистрации'
+            
+            return scls
     except Exception as er:
-        return 'У вас не добавлены пункты. Добавьте их в меню регистрации'
-    
+        return er
     finally:
         await cfg.engine.dispose()
