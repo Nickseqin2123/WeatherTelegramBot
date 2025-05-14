@@ -1,9 +1,5 @@
-import json
-import os
 from configparser import ConfigParser
-from curl_cffi.requests import AsyncSession
-from fake_headers import Headers
-
+from aiohttp import ClientSession
 
 class Content:
     __instance = None
@@ -15,53 +11,16 @@ class Content:
         return cls.__instance
     
     def __init__(self):
-        if hasattr(self, "initialized") and self.initialized:
-            return
-        
         cfg = ConfigParser()
         cfg.read('data.ini')
-
-        self.url = 'https://yandex.ru/pogoda/cheboksary?'
-        self.session = AsyncSession(impersonate='chrome120')
-
-        self.initialized = True
         
-    def init_dynamic_headers(self):
-        headers = Headers(browser="chrome", os="win", headers=True).generate()
-        headers.update({
-            "authority": "yandex.ru",
-            "referer": "",
-            "accept-encoding": "gzip, deflate, br, zstd",
-            "sec-fetch-site": "none",
-            "sec-fetch-mode": "navigate",
-            "sec-fetch-user": "?1",
-            "upgrade-insecure-requests": "1",
-            "cache-control": "max-age=0",
-            })
-        
-        self.headers = headers
+        self.__token = cfg['TOKEN']['token_api']
         
     async def weather(self, lat, lon):
-        quer_url = f'{self.url}lat={lat}&lon={lon}'
+        quer_url = f'https://api.openweathermap.org/data/2.5/weather?appid={self.__token}&lang=ru&lat={lat}&lon={lon}&units=metric'
         
-        self.init_dynamic_headers()
-        self.headers.update({
-            'referer': quer_url
-        })
-                
-        if os.path.exists('cookies.json'):
-            await self.load_cookies()
-    
-        response = await self.session.get(url=quer_url, headers=self.headers)
-        await self.save_cookies()
+        async with ClientSession() as session:
+            async with session.get(url=quer_url) as response:
+                return await response.json()
         
         return response.text
-    
-    async def save_cookies(self, filename='cookies.json'):          
-        with open(filename, 'w', encoding='utf-8') as f:
-            json.dump(self.session.cookies.get_dict(), f, ensure_ascii=False)
-
-    async def load_cookies(self, filename='cookies.json'):
-        with open(filename, encoding='utf-8') as f:
-            cookies = json.load(f)
-            self.session.cookies.update(cookies)

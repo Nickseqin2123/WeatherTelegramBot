@@ -21,7 +21,6 @@ async def punct_gt(callback: CallbackQuery):
     user_id = callback.from_user.id
     lati = from_pars['lat']
     long = from_pars['lon']
-    print(lati, long)
     
     if users_last_clik.get(user_id):
         await callback.message.answer(
@@ -34,13 +33,14 @@ async def punct_gt(callback: CallbackQuery):
     await callback.message.answer(
         text='Идёт запрос погоды...'
     )
+    
     content = Content()
     response = await content.weather(lat=lati, lon=long)
     text = await parser(response)
     
     await callback.message.answer(
         text=text,
-        reply_markup=await start_keyb()
+        reply_markup=await start_keyb(), parse_mode='HTML'
     )
 
 
